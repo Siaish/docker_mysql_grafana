@@ -175,11 +175,12 @@ docker compose exec -T mysql mysql -uroot -p"root" \
 ### Grafana user — SELECT only
 
 Log in to phpMyAdmin as `root` (http://localhost:8080) and run the following in the SQL tab:
+Note : db is name of your database.
 
 ```sql
 CREATE USER 'grafanaReader' IDENTIFIED BY 'password';
-GRANT SELECT ON simran.Call_CX TO 'grafanaReader';
-GRANT SELECT ON simran.Chat_CX TO 'grafanaReader';
+GRANT SELECT ON db.Call_CX TO 'grafanaReader';
+GRANT SELECT ON db.Chat_CX TO 'grafanaReader';
 ```
 
 > **Why a separate Grafana user?**  
@@ -206,9 +207,9 @@ Open `mysqlconnect.js` and fill in the connection block:
 const connection = mysql.createConnection({
   host: "127.0.0.1",
   port: '3314',          // custom host port from docker-compose
-  user: "simran",
-  password: "simran",
-  database: 'simran',
+  user: "",
+  password: "",
+  database: 'db',
 });
 ```
 
