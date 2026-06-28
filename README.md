@@ -186,8 +186,6 @@ GRANT SELECT ON db.Chat_CX TO 'grafanaReader';
 > **Why a separate Grafana user?**  
 > The `grafanaReader` account is restricted to `SELECT` on only the two reporting tables. This means Grafana can never modify data even if credentials are exposed.
 
-> **Why didn't logging into phpMyAdmin with `simran` work?**  
-> phpMyAdmin requires `mysql_native_password` authentication by default. MySQL 8 uses `caching_sha2_password` for new users. Logging in as `root` bypasses this for admin tasks.
 
 ---
 
@@ -286,7 +284,7 @@ Forwarding  tcp://0.tcp.in.ngrok.io:14597 -> localhost:3306
 | Field | Value |
 |-------|-------|
 | Host URL | `0.tcp.in.ngrok.io:14597` (use your actual ngrok hostname + port) |
-| Database | `` |
+| Database | `db` |
 | User | `grafanaReader` |
 | Password | `password` |
 | TLS/SSL Mode | `disable` (ngrok handles the outer transport) |
@@ -298,7 +296,7 @@ Forwarding  tcp://0.tcp.in.ngrok.io:14597 -> localhost:3306
 
 ### Step 3 — Build a dashboard
 
-Use the Grafana query editor against the `simran` data source. Example queries:
+Use the Grafana query editor against the `db` data source. Example queries:
 
 ```sql
 -- Calls per agent today
@@ -328,15 +326,3 @@ Reference: https://grafana.com/docs/grafana/latest/datasources/mysql/
 | `POST` | `/insert` | Receives TaskRouter `reservation.completed` payload and inserts into the correct table |
 
 ---
-
-## Troubleshooting
-
-| Symptom | Likely cause | Fix |
-|---------|-------------|-----|
-| `ECONNREFUSED 127.0.0.1:3314` | MySQL container not running | `docker compose up -d` |
-| `ER_ACCESS_DENIED_ERROR` | Wrong credentials in `mysqlconnect.js` | Match `user`/`password` to docker-compose env vars |
-| Grafana "connection refused" | ngrok TCP tunnel not running | `ngrok tcp 3306` and update the host URL in Grafana |
-| Grafana "host not found" | Stale ngrok URL | Free ngrok URLs change each restart — update the data source host after each `ngrok tcp` restart |
-| phpMyAdmin login fails with `simran` user | `caching_sha2_password` auth plugin | Use `root` for phpMyAdmin admin tasks; `simran` works fine from Node.js via `mysql2` |
-| `/insert` returns 500 | Table does not exist | Hit `/createtable` first |
-| Row goes to wrong table | `TaskQueueTargetExpression` does not contain `voice_support` | Verify the queue expression in your TaskRouter workflow |
