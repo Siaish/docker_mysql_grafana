@@ -163,13 +163,13 @@ To create `Chat_CX`, uncomment the second `sql` block inside `/createtable` in `
 
 Two users are configured — one for the app, one for Grafana (read-only).
 
-### App user — full access on `simran` schema
+### App user — full access on `db` schema
 
 Run from your terminal (Docker Compose must be up):
 
 ```bash
 docker compose exec -T mysql mysql -uroot -p"root" \
-  -e "GRANT ALL ON simran.* TO 'simran'@'%';"
+  -e "GRANT ALL ON db.* TO 'username'@'%';"
 ```
 
 ### Grafana user — SELECT only
